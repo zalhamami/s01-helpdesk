@@ -1,0 +1,24 @@
+1. buat model sama migrasi (auto)
+2. atur isi table (user) > di dalam model dan migration
+3. php artisan migrate (terminal) > database kebuat
+4. bikin controller (user)
+    public function index (){
+        return view('user-setting'); (ada di web.php)
+    }
+5. Route::post('/location-setting', [LocationController::class, 'store']); > tambahin ini di web.php
+6. tambahin store di controller
+public function store(Request $request)
+    {
+        $data = $request->validate([
+            'location' => 'required',
+        ]);
+
+        Location::create($data);
+
+        return back()->with('success', 'Data berhasil disimpan');
+    }
+7. use App\Models\Location; > di controller
+8. <form action="/location-setting" method="POST">
+              @csrf
+9. <input type="submit" class="btn btn-primary" value="Save Change"/>
+10. use App\Http\Controllers\LocationController; paling atas di web.php
