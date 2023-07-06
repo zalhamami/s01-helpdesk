@@ -8,15 +8,15 @@ use Yajra\DataTables\DataTables;
 
 class LocationController extends Controller
 {
-    public function index (){
+    public function index()
+    {
         return view('location-setting');
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'location' => 'required',
-            
+            'location' => 'required|unique:locations',
         ]);
 
         Location::create($data);
@@ -24,13 +24,14 @@ class LocationController extends Controller
         return back()->with('success', 'Data berhasil disimpan');
     }
 
-    public function getLocation(Request $request){
+    public function getLocation(Request $request)
+    {
+        $locations = Location::all();
+
         if ($request->ajax()) {
-            $locations = Location::select('id', 'location')->get();
-            return Datatables::of($locations)
-                ->make(true);
-
+            return Datatables::of($locations)->make(true);
         }
-    }
 
+        return $locations;
+    }
 }

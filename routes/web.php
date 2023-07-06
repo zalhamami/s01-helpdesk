@@ -33,8 +33,7 @@ Route::get('/get-tickets', function () {
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/dashboard-admin', [DashboardController::class, 'index']);
-
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
 
 Route::middleware(['guest'])->group(function () {
@@ -73,13 +72,17 @@ Route::get('/create-new', function () {
     return view('create-new');
 });
 
-Route::get('/location-setting', [LocationController::class, 'index']);
-Route::post('/location-setting', [LocationController::class, 'store']);
-Route::get('datalocation', [LocationController::class, 'getLocation'])->name('getlocation');
+Route::group(['prefix' => 'location-setting'], function () {
+    Route::get('/', [LocationController::class, 'index'])->name('location.index');
+    Route::post('/', [LocationController::class, 'store'])->name('location.store');
+    Route::get('/data', [LocationController::class, 'getLocation'])->name('location.data');
+});
 
-Route::get('/user-setting', [UserSettingController::class, 'index']);
-Route::post('/user-setting', [UserSettingController::class, 'store']);
-Route::get('datausersetting', [UserSettingController::class, 'getUsersetting'])->name('getusersetting');
+Route::group(['prefix' => 'user-setting'], function () {
+    Route::get('/', [UserSettingController::class, 'index'])->name('user-setting.index');
+    Route::post('/', [UserSettingController::class, 'store'])->name('user-setting.store');
+    Route::get('/data', [UserSettingController::class, 'getUsersetting'])->name('user-setting.data');
+});
 
 Route::get('/profile-admin', function () {
     return view('profile-admin');

@@ -8,14 +8,15 @@ use Yajra\DataTables\DataTables;
 
 class UserSettingController extends Controller
 {
-    public function index (){
+    public function index()
+    {
         return view('user-setting');
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'user_setting' => 'required',
+            'user_setting' => 'required|unique:user_settings',
         ]);
 
         UserSetting::create($data);
@@ -23,13 +24,15 @@ class UserSettingController extends Controller
         return back()->with('success', 'Data berhasil disimpan');
     }
 
-    public function getUsersetting(Request $request){
-        if ($request->ajax()) {
-            $user_settings = UserSetting::select('id', 'user_setting')->get();
-            return Datatables::of($user_settings)
-                ->make(true);
+    public function getUsersetting(Request $request)
+    {
+        $userSettings = UserSetting::all();
 
+        if ($request->ajax()) {
+            return Datatables::of($userSettings)->make(true);
         }
+
+        return $userSettings;
     }
 
     public function updateUsersetting(Request $request) {
@@ -37,10 +40,8 @@ class UserSettingController extends Controller
         if ($userSetting) {
             $userSetting->user_setting = $request->user_setting;
             $userSetting->save();
-            // Respon sukses jika diperlukan
             return response()->json(['success' => true]);
         }
-        // Tangani kesalahan jika data tidak ditemukan
         return response()->json(['success' => false, 'message' => 'User setting not found.']);
     }
 }
