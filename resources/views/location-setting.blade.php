@@ -40,21 +40,21 @@ $breadcrumbs = [
           <h5 class="modal-title">Create New Location</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body">
-          <form action="/location-setting" method="POST">
+        <form action="{{ route('location.store') }}" method="POST">
+          <div class="modal-body">
             @csrf
             <div class="form-group mb-4">
               <label for="" class="mb-3">Location</label>
               <input type="text" class="form-control form-control-solid" name="location" >
               </select> 
             </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <input type="submit" class="btn btn-primary" value="Save Change"/>
-        </div>
-      </form>
-    </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-primary" value="Save Change"/>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -67,7 +67,7 @@ $breadcrumbs = [
           "ajax": "{{ route('location.data') }}",
           "columns":[
             { "data": "id" },
-            { "data": "location" },
+            { "data": "name" },
             { "data": "created_at" },
             { "data": "updated_at" },
           ]

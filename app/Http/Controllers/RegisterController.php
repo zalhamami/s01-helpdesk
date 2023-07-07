@@ -31,7 +31,7 @@ class RegisterController extends Controller
             'password' => 'required|min:8',
             'no_telp' => 'required',
             'location' => 'required',
-            'user_setting' => 'required',
+            'user_setting' => 'required|integer|exists:user_settings,id',
         ]);
 
 
@@ -43,23 +43,25 @@ class RegisterController extends Controller
             'password' => bcrypt($request->password),
             'no_telp' => '0' . $request->no_telp,
             'location' => $request->location,
-            'user_setting' => $request->user_setting,
+            'user_setting_id' => $request->user_setting,
         ]);
 
         return back()->with('success', 'Data berhasil disimpan');
     }
 
     public function getRegister(Request $request)
-{
-    if ($request->ajax()) {
-        $registers = User::select('id', 'name', 'username', 'email', 'no_telp', 'location', 'user_setting')->get();
-        
-        return Datatables::of($registers)
-            ->addColumn('no_telp', function ($register) {
-                return '0' . $register->no_telp;
-            })
-            ->make(true);
+    {
+        $registers = User::all();
+
+        if ($request->ajax()) {
+            return Datatables::of($registers)
+                ->addColumn('no_telp', function ($register) {
+                    return '0' . $register->no_telp;
+                })
+                ->make(true);
+        }
+
+        return $registers;
     }
-}
 
 }

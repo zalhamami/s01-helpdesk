@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('user_setting');
+            $table->string('name');
             $table->timestamps();
         });
     }

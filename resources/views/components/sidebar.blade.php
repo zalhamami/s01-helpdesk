@@ -10,7 +10,7 @@
       <a href="{{ route('dashboard') }}" class="nav-label">Dashboard</a>
       <ul class="nav nav-sidebar">
         <li class="nav-item">
-          <a href="/dashboard-admin" class="nav-link"><i class="ri-home-3-line"></i> <span>Dashboard</span></a>
+          <a href="{{ route('dashboard') }}" class="nav-link"><i class="ri-home-3-line"></i> <span>Dashboard</span></a>
         </li>
         <li class="nav-item">
           <a href="{{ route('location.index') }}" class="nav-link"><i class="ri-map-pin-3-line"></i> <span>Location Setting</span></a>

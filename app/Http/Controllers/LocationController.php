@@ -16,10 +16,12 @@ class LocationController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'location' => 'required|unique:locations',
+            'location' => 'required|unique:locations,name',
         ]);
 
-        Location::create($data);
+        Location::create([
+            'name' => $data['location'],
+        ]);
 
         return back()->with('success', 'Data berhasil disimpan');
     }

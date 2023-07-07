@@ -16,10 +16,12 @@ class UserSettingController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'user_setting' => 'required|unique:user_settings',
+            'user_setting' => 'required|unique:user_settings,name',
         ]);
 
-        UserSetting::create($data);
+        UserSetting::create([
+            'name' => $data['user_setting'],
+        ]);
 
         return back()->with('success', 'Data berhasil disimpan');
     }

@@ -17,19 +17,19 @@ class LoginController extends Controller
         $credentials = $request->only('username', 'password');
 
         if (Auth::attempt($credentials)) {
-            // Jika otentikasi berhasil, redirect ke halaman yang ditentukan
-            return redirect()->intended('/dashboard-admin');
-        } else {
-            // Jika otentikasi gagal, redirect kembali ke halaman login
-            return back()->with('loginError', 'Login Failed!');
+            return redirect()->route('dashboard');
         }
+
+        return back()->with('loginError', 'Login Failed!');
     }
 
     public function logout()
     {
         Auth::logout();
+
         request()->session()->invalidate();
         request()->session()->regenerateToken();
-        return redirect('/login');
+
+        return redirect()->route('login');
     }
 }

@@ -26,4 +26,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(UserSetting::class);
     }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
+    }
 }

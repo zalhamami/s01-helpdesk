@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('helpdesk_ticket_helpdesks', function (Blueprint $table) {
+        Schema::create('ticket_actions', function (Blueprint $table) {
             $table->id();
-            $table->string('pengecekan_link');
-            $table->string('pengecekan_link2');
-            $table->text('text');
-            $table->string('myCheckbox');
+            $table->foreignId('ticket_id')->constrained('tickets');
+            $table->foreignId('action_list_id')->constrained('action_lists');
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('helpdesk_ticket_helpdesks');
+        Schema::dropIfExists('ticket_actions');
     }
 };
