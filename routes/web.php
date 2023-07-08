@@ -43,25 +43,26 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::group(['prefix' => 'ticket'], function () {
+        Route::get('/', [TicketController::class, 'index'])->name('ticket.index');
+        Route::get('/{ticket}/detail', [TicketController::class, 'show'])->name('ticket.show');
+        Route::get('/{ticket}/delete', [TicketController::class, 'delete'])->name('ticket.delete');
+        Route::post('/technician', [TicketController::class, 'assignTechnician'])->name('ticket.assignTechnician');
         Route::post('/', [TicketController::class, 'store'])->name('ticket.store');
         Route::get('/data', [TicketController::class, 'getTickets'])->name('ticket.data');
+        Route::get('/data-helpdesk', [TicketController::class, 'getHelpdeskTickets'])->name('ticket.data-helpdesk');
+        Route::get('/data-technician', [TicketController::class, 'getTechnicianTickets'])->name('ticket.data-technician');
+    });
+
+    Route::group(['prefix' => 'user'], function () {
+        Route::get('/', [RegisterController::class, 'index'])->name('user.index');
+        Route::post('/', [RegisterController::class, 'store'])->name('user.store');
+        Route::get('/data', [RegisterController::class, 'getUsers'])->name('user.data');
     });
 });
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/login', [LoginController::class, 'index'])->name('login');
     Route::post('/login', [LoginController::class, 'authenticate']);  
-});
-
-Route::get('/helpdesk-ticket-helpdesk', [HelpdeskTicketHelpdeskController::class, 'index']);
-Route::post('/helpdesk-ticket-helpdesk', [HelpdeskTicketHelpdeskController::class, 'store'])->name('helpdesk');
-
-Route::get('/dashboard-helpdesk', function () {
-    return view('dashboard-helpdesk');
-});
-
-Route::get('/dashboard-teknisi', function () {
-    return view('dashboard-teknisi');
 });
 
 Route::get('/helpdesk-ticket-edit', function () {
@@ -76,9 +77,6 @@ Route::get('/helpdesk-ticket-solved', function () {
     return view('helpdesk-ticket-solved');
 });
 
-Route::get('/add-user', [RegisterController::class, 'index']);
-Route::post('/add-user', [RegisterController::class, 'store']);
-Route::get('dataregister', [RegisterController::class, 'getRegister'])->name('getregister');
 
 Route::get('/create-new', function () {
     return view('create-new');

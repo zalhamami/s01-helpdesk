@@ -14,10 +14,10 @@ class RegisterController extends Controller
 {
     public function index ()
     {
-            $title = 'User';
-            $location = Location::all();
-            $user_setting = UserSetting::all();
-            return view('add-user', ['title' => $title], compact('location', 'user_setting'));
+        $title = 'User';
+        $location = Location::all();
+        $user_setting = UserSetting::all();
+        return view('add-user', ['title' => $title], compact('location', 'user_setting'));
     }
 
 
@@ -49,9 +49,9 @@ class RegisterController extends Controller
         return back()->with('success', 'Data berhasil disimpan');
     }
 
-    public function getRegister(Request $request)
+    public function getUsers(Request $request)
     {
-        $registers = User::all();
+        $registers = User::with(['location', 'user_setting'])->get();
 
         if ($request->ajax()) {
             return Datatables::of($registers)

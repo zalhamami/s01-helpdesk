@@ -74,7 +74,7 @@ $breadcrumbs = [
                 <select class="form-select" name="location">
                     @foreach ($location as $location)
                     <option value="{{ $location->id }}">
-                        {{ $location->location }}</option>
+                        {{ $location->name }}</option>
                     @endforeach
                 </select>  
               </div>
@@ -83,8 +83,9 @@ $breadcrumbs = [
                 <select class="form-select" name="user_setting">
                   @foreach ($user_setting as $user_setting)
                     <option value="{{ $user_setting->id }}">
-                        {{ $user_setting->user_setting }}</option>
+                        {{ $user_setting->name }}</option>
                   @endforeach
+                </select>
               </div>
               <div class="text-end mt-4">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -103,15 +104,25 @@ $breadcrumbs = [
         $('#add-user').DataTable({
           "processing": true,
           "serverSide": true,
-          "ajax": "{{ route('getregister') }}",
+          "ajax": "{{ route('user.data') }}",
           "columns":[
             { "data": "id" },
             { "data": "name" },
             { "data": "username" },
             { "data": "email" },
             { "data": "no_telp" },
-            { "data": "location_id" },
-            { "data": "user_setting_id" },
+            {
+              "data": "location" ,
+              "render": function(data, type, row) {
+                return data.name;
+              },
+            },
+            {
+              "data": "user_setting" ,
+              "render": function(data, type, row) {
+                return data.name;
+              },
+            },
           ]
         });
       });

@@ -1,4 +1,4 @@
-@props(['breadcrumbs'])
+@props(['breadcrumbs', 'title' => null])
 
 <div class="d-md-flex align-items-center justify-content-between mb-4">
   <div>
@@ -13,5 +13,8 @@
         </li>
       @endforeach
     </ol>
+    @if($title)
+      <h4 class="main-title mb-0">{{ $title }}</h4>
+    @endif
   </div>
 </div>

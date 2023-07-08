@@ -24,8 +24,6 @@ $breadcrumbs = [
             <tr>
               <th scope="col" width="5%">No</th>
               <th scope="col" width="50%">User Setting</th>
-              <th scope="col">Created At</th>
-              <th scope="col">Updated At</th>
             </tr>
           </thead>
         </table>
@@ -68,8 +66,6 @@ $breadcrumbs = [
           "columns":[
             { "data": "id" },
             { "data": "name" },
-            { "data": "created_at" },
-            { "data": "updated_at" },
           ],
         });
       });
