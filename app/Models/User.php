@@ -22,6 +22,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $with = ['user_setting', 'location'];
+
     public function user_setting()
     {
         return $this->belongsTo(UserSetting::class);

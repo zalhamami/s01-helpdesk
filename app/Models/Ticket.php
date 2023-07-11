@@ -11,6 +11,8 @@ class Ticket extends Model
     use HasFactory, ModelTimestamps;
     
     protected $guarded = ['id'];
+    
+    protected $with = ['technician', 'helpdesk', 'actions'];
 
     public function technician()
     {

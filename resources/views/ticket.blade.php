@@ -37,13 +37,11 @@ $breadcrumbs = [
           <thead>
             <tr>
               <th scope="col" width="5%">No</th>
-              <th scope="col">Date</th>
+              <th scope="col" width="100">Date</th>
               <th scope="col">Helpdesk</th>
-              <th scope="col">Title</th>
-              {{-- <th scope="col">Description</th> --}}
-              <th scope="col">Check Link 1</th>
-              <th scope="col">Check Link 2</th>
-              {{-- <th scope="col">Actions</th> --}}
+              <th scope="col">Location</th>
+              <th scope="col" width="300">Description</th>
+              <th scope="col" width="300">Helpdesk Solution</th>
               <th scope="col">Status</th>
               <th scope="col">Technician</th>
               <th scope="col"></th>
@@ -58,14 +56,14 @@ $breadcrumbs = [
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Aksi</h5>
+          <h5 class="modal-title">Create a Ticket</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <form action="{{ route('ticket.store') }}" method="POST">
           <div class="modal-body">
             @csrf
             <div class="form-group mb-4">
-              <label for="pengecekan_link" class="mb-3">Pengecekan Link</label>
+              <label for="pengecekan_link" class="mb-3">Check Link</label>
               <select class="form-select mb-2" name="check_link_1" id="check_link_1">
                 <option value="GSM DOWN">GSM DOWN</option>
                 <option value="GSM UP">GSM UP</option>
@@ -76,17 +74,17 @@ $breadcrumbs = [
               </select>
             </div>
             <div class="form-group mb-4">
-              <label for="text" class="mb-3">Judul</label>
+              <label for="text" class="mb-3">Title</label>
               <input type="text" class="form-control mb-2" id="text" name="name">
             </div>
 
             <div class="form-group mb-4">
-              <label for="text" class="mb-3">Deskripsi</label>
+              <label for="text" class="mb-3">Description</label>
               <textarea input type="text" class="form-control mb-2" id="text" name="description" rows="5"></textarea>
             </div>
 
             <div class="form-group">
-              <label for="myCheckbox" id="check" class="mb-3">Aksi</label>              
+              <label for="myCheckbox" id="check" class="mb-3">Helpdesk Solution</label>              
               @foreach ($actions as $action)
                 <div class="mb-2">
                   <input value="{{ $action->id }}" type="checkbox" id="action-{{ $action->id }}" name="actions[]">
@@ -99,7 +97,58 @@ $breadcrumbs = [
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <input type="submit" class="btn btn-primary" value="Save Change"/>
+            <input type="submit" class="btn btn-primary" value="Save Changes"/>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Update Ticket</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{{ route('ticket.update') }}" method="POST">
+          <div class="modal-body">
+            @csrf
+            <input type="hidden" id="update_id" name="ticket_id">
+            <div class="form-group mb-4">
+              <label for="pengecekan_link" class="mb-3">Link Check</label>
+              <select class="form-select mb-2" name="check_link_1" id="update_check_link_1" disabled>
+                <option value="GSM DOWN">GSM DOWN</option>
+                <option value="GSM UP">GSM UP</option>
+              </select>
+              <select class="form-select" name="check_link_2" id="update_check_link_2" disabled>
+                <option value="MPLS DOWN">MPLS DOWN</option>
+                <option value="MPLS UP">MPLS UP</option>
+              </select>
+            </div>
+            <div class="form-group mb-4">
+              <label for="text" class="mb-3">Title</label>
+              <input type="text" class="form-control mb-2" id="update_title" name="name" disabled>
+            </div>
+
+            <div class="form-group mb-4">
+              <label for="text" class="mb-3">Description</label>
+              <textarea input type="text" class="form-control mb-2" id="update_description" name="description" rows="5" disabled></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="myCheckbox" id="check" class="mb-3">Helpdesk Solution</label>              
+              <div id="update_action_list"></div>
+            </div>
+
+            <div class="form-group mb-4">
+              <label for="text" class="mb-3">Technician Action</label>
+              <textarea input type="text" class="form-control mb-2" id="update_solution" name="solution" rows="5" required></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-primary" value="Solve Ticket"/>
           </div>
         </form>
       </div>
@@ -153,24 +202,27 @@ $breadcrumbs = [
                 return data.name;
               },
             },
-            { "data": "name" },
-            // { "data": "description" },
-            { "data": "check_link_1" },
-            { "data": "check_link_2" },
-            // { 
-            //   "data": "actions",
-            //   "render": function(data, type, row) {
-            //     if (data.length == 0) return '-';
+            {
+              "data": "helpdesk" ,
+              "render": function(data, type, row) {
+                return data.location.name;
+              },
+            },
+            { "data": "description" },
+            { 
+              "data": "actions",
+              "render": function(data, type, row) {
+                if (data.length == 0) return '-';
 
-            //     let html = '<ul style="margin-left: 1rem">';
-            //     data.forEach(function(item) {
-            //       html += '<li>' + item.action.name + '</li>';
-            //     });
-            //     html += '</ul>';
+                let html = '<ul style="margin-left: 1rem">';
+                data.forEach(function(item) {
+                  html += '<li>' + item.action.name + '</li>';
+                });
+                html += '</ul>';
 
-            //     return html;
-            //   }
-            // },
+                return html;
+              }
+            },
             { "data": "status" },
             {
               "data": "technician" ,
@@ -186,8 +238,8 @@ $breadcrumbs = [
                 if (!data.technician) {
                   html += '<a href="#assignTechnicianModal" data-bs-toggle="modal"><button class="btn btn-secondary btn-sm" onclick="assignTechnician(' + data.id + ')">Assign Technician</button></a>';
                 }
-                html += '<button class="btn btn-primary btn-sm" onclick="editRow(' + data.id + ')">View</button>';
-                html += '<button class="btn btn-danger btn-sm" onclick="deleteRow(' + data.id + ')">Delete</button>';
+                html += '<a href="#editModal" data-bs-toggle="modal"><button class="btn btn-primary btn-sm" onclick="editRow(' + data.id + ')">Edit</button></a>';
+                // html += '<button class="btn btn-danger btn-sm" onclick="deleteRow(' + data.id + ')">Delete</button>';
                 html += '</div>';
                 return html;
               }
@@ -201,13 +253,32 @@ $breadcrumbs = [
         ticketTechnicianId.value = id;
       }
 
-      function editRow(id) {
-        window.location.href = `/ticket/${id}/detail`;
+      async function editRow(id) {
+        const ticketId = document.getElementById('update_id');
+        const ticketTitle = document.getElementById('update_title');
+        const ticketDescription = document.getElementById('update_description');
+        const ticketSolution = document.getElementById('update_solution');
+        const ticketActionList = document.getElementById('update_action_list');
+
+        const response = await fetch(`/api/ticket/${id}`);
+        const currentTicket = await response.json();
+
+        ticketId.value = currentTicket.id;
+        ticketTitle.value = currentTicket.name;
+        ticketDescription.value = currentTicket.description;
+        ticketSolution.value = currentTicket.solution;
+
+        let helpdeskSolution = '<ul>';
+        currentTicket.actions.forEach((item) => {
+          helpdeskSolution += `<li>${item.action.name}</li>`;
+        });
+        helpdeskSolution += '</ul>';
+        ticketActionList.innerHTML = helpdeskSolution;
       }
 
       function deleteRow(id) {
-        // Handle the delete action for the corresponding row
-        console.log('Delete row:', id);
+        if (confirm('Are you sure want to delete this ticket?') == false) return;
+        window.location.href = `/ticket/${id}/delete`;
       }
     </script>
   @endpush

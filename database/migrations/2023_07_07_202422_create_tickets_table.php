@@ -16,12 +16,13 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('technician_id')->nullable()->constrained('users');
             $table->foreignId('helpdesk_id')->nullable()->constrained('users');
-            $table->enum('status', ['open', 'pending', 'closed'])->default('open');
+            $table->enum('status', ['open', 'pending', 'solved', 'closed'])->default('open');
             $table->text('description');
-            $table->text('problem_analysis')->nullable();
             $table->text('solution')->nullable();
             $table->string('check_link_1')->nullable();
             $table->string('check_link_2')->nullable();
+            $table->timestamp('solved_at')->nullable();
+            $table->timestamp('closed_at')->nullable();
             $table->timestamps();
         });
     }

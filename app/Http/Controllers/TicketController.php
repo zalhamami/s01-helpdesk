@@ -8,6 +8,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
+use Illuminate\Support\Str;
 
 class TicketController extends Controller
 {
@@ -23,7 +24,12 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        return view('helpdesk-ticket-helpdesk', compact('ticket'));
+        return view('ticket-detail', compact('ticket'));
+    }
+
+    public function get(Ticket $ticket)
+    {
+        return response()->json($ticket);
     }
 
     public function store(Request $request)
@@ -43,6 +49,7 @@ class TicketController extends Controller
             'check_link_1' => $data['check_link_1'],
             'check_link_2' => $data['check_link_2'],
             'helpdesk_id' => auth()->id(),
+            'code' => Str::uuid()
         ]);
 
         foreach ($data['actions'] as $action) {
@@ -52,6 +59,24 @@ class TicketController extends Controller
         }
 
         return back()->with('success', 'Data berhasil disimpan');
+    }
+
+    public function update(Request $request)
+    {
+        $data = $request->validate([
+            'ticket_id' => 'required|exists:tickets,id',
+            'solution' => 'required|string',
+        ]);
+
+        $ticket = Ticket::find($request->ticket_id);
+
+        $ticket->update([
+            'solution' => $data['solution'],
+            'status' => 'solved',
+            'solved_at' => now(),
+        ]);
+
+        return back()->with('success', 'Data berhasil diubah');
     }
 
     public function getTickets(Request $request)
@@ -106,9 +131,12 @@ class TicketController extends Controller
         return back()->with('success', 'Data berhasil disimpan');
     }
 
-    public function delete(Ticket $ticket)
+    public function close(Ticket $ticket)
     {
-        $ticket->delete();
+        $ticket->update([
+            'status' => 'closed',
+            'closed_at' => now()
+        ]);
 
         return back()->with('success', 'Data berhasil dihapus');
     }
