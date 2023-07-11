@@ -81,7 +81,11 @@ class TicketController extends Controller
 
     public function getTickets(Request $request)
     {
-        $tickets = Ticket::with(['actions', 'helpdesk', 'technician'])->get();
+        $tickets = Ticket::with(['actions', 'helpdesk', 'technician']);
+        if ($request->status) {
+            $tickets = $tickets->where('status', $request->status);
+        }
+        $tickets = $tickets->get();
 
         if ($request->ajax()) {
             return DataTables::of($tickets)->make(true);
@@ -93,8 +97,13 @@ class TicketController extends Controller
     public function getHelpdeskTickets(Request $request)
     {
         $tickets = Ticket::where('helpdesk_id', auth()->id())
-            ->with(['actions', 'helpdesk', 'technician'])
-            ->get();
+            ->with(['actions', 'helpdesk', 'technician']);
+
+        if ($request->status) {
+            $tickets = $tickets->where('status', $request->status);
+        }
+
+        $tickets = $tickets->get();
 
         if ($request->ajax()) {
             return DataTables::of($tickets)->make(true);
@@ -106,8 +115,13 @@ class TicketController extends Controller
     public function getTechnicianTickets(Request $request)
     {
         $tickets = Ticket::where('technician_id', auth()->id())
-            ->with(['actions', 'helpdesk', 'technician'])
-            ->get();
+            ->with(['actions', 'helpdesk', 'technician']);
+
+        if ($request->status) {
+            $tickets = $tickets->where('status', $request->status);
+        }
+        
+        $tickets = $tickets->get();
 
         if ($request->ajax()) {
             return DataTables::of($tickets)->make(true);
@@ -138,6 +152,6 @@ class TicketController extends Controller
             'closed_at' => now()
         ]);
 
-        return back()->with('success', 'Data berhasil dihapus');
+        return back()->with('success', 'Ticket berhasil ditutup');
     }
 }

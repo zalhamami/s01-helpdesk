@@ -20,12 +20,12 @@ $breadcrumbs = [
         Create New
       </a>
       
-      <form action="#" class="mb-3">
+      <form id="filterForm" action="#" class="mb-3">
         <div class="d-flex">
-          <select class="form-select w-auto">
-            <option value="1">Open</option>
-            <option value="2">Closed</option>
-            <option value="3">Date</option>
+          <select id="filterSelect" class="form-select w-auto">
+            <option value="open">Open</option>
+            <option value="solved">Solved</option>
+            <option value="closed">Closed</option>
           </select>
           <button class="btn btn-primary ms-2">
             Filter
@@ -188,11 +188,13 @@ $breadcrumbs = [
 
   @push('scripts')
     <script type="text/javascript">
+      const role = '{{ $role }}';
       $(document).ready(function() {
-        $('#ticket').DataTable({
+        const requestUrl = "{{ $role == 'Helpdesk' ? route('ticket.data-helpdesk') : route('ticket.data-technician') }}";
+        const datatable = $('#ticket').DataTable({
           "processing": true,
           "serverSide": true,
-          "ajax": "{{ $role == 'Helpdesk' ? route('ticket.data-helpdesk') : route('ticket.data-technician') }}",
+          "ajax": requestUrl,
           "columns":[
             { "data": "id" },
             { "data": "created_at" },
@@ -238,7 +240,15 @@ $breadcrumbs = [
                 if (!data.technician) {
                   html += '<a href="#assignTechnicianModal" data-bs-toggle="modal"><button class="btn btn-secondary btn-sm" onclick="assignTechnician(' + data.id + ')">Assign Technician</button></a>';
                 }
-                html += '<a href="#editModal" data-bs-toggle="modal"><button class="btn btn-primary btn-sm" onclick="editRow(' + data.id + ')">Edit</button></a>';
+
+                if (role == 'Teknisi' && data.status != 'closed') {
+                  html += '<a href="#editModal" data-bs-toggle="modal"><button class="btn btn-primary btn-sm" onclick="editRow(' + data.id + ')">Edit</button></a>';
+                }
+
+                if (role == 'Helpdesk' && data.status == 'solved') {
+                  html += '<button class="btn btn-primary btn-sm" onclick="closeTicket(' + data.id + ')">Close</button>';
+                }
+
                 // html += '<button class="btn btn-danger btn-sm" onclick="deleteRow(' + data.id + ')">Delete</button>';
                 html += '</div>';
                 return html;
@@ -246,11 +256,24 @@ $breadcrumbs = [
             },
           ]
         });
+
+        $('#filterForm').on('submit', function(event) {
+          event.preventDefault();
+          var selectedStatus = $('#filterSelect').val();
+          // Update the datatable's AJAX URL with the selected status
+          datatable.ajax.url(`${requestUrl}?status=${selectedStatus}`).load();
+        });
       });
 
       function assignTechnician(id) {
         const ticketTechnicianId = document.getElementById('ticket-technician-id');
         ticketTechnicianId.value = id;
+      }
+
+      function closeTicket(id) {
+        if (confirm('Are you sure you want to close this ticket?')) {
+          window.location.href = '/ticket/' + id + '/close';
+        }
       }
 
       async function editRow(id) {

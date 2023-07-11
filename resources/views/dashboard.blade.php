@@ -13,12 +13,12 @@ $breadcrumbs = [
       <h5 class="card-title mb-0">List of all tickets</h5>
     </div>
     <div class="card-body">
-      <form action="#" class="mb-3">
+      <form id="filterForm" action="#" class="mb-3">
         <div class="d-flex">
-          <select class="form-select w-auto">
-            <option value="1">Open</option>
-            <option value="2">Closed</option>
-            <option value="3">Date</option>
+          <select id="filterSelect" class="form-select w-auto">
+            <option value="open">Open</option>
+            <option value="solved">Solved</option>
+            <option value="closed">Closed</option>
           </select>
           <button class="btn btn-primary ms-2">
             Filter
@@ -30,15 +30,14 @@ $breadcrumbs = [
           <thead>
             <tr>
               <th scope="col" width="5%">No</th>
-              <th scope="col">Date</th>
+              <th scope="col" width="100">Date</th>
               <th scope="col">Helpdesk</th>
-              <th scope="col">Title</th>
-              {{-- <th scope="col">Description</th> --}}
-              <th scope="col">Check Link 1</th>
-              <th scope="col">Check Link 2</th>
-              {{-- <th scope="col">Actions</th> --}}
+              <th scope="col">Location</th>
+              <th scope="col" width="300">Description</th>
+              <th scope="col" width="300">Helpdesk Solution</th>
               <th scope="col">Status</th>
               <th scope="col">Technician</th>
+              <th scope="col"></th>
             </tr>
           </thead>
         </table>
@@ -49,10 +48,11 @@ $breadcrumbs = [
   @push('scripts')
     <script type="text/javascript">
       $(document).ready(function() {
-        $('#ticket').DataTable({
+        const requestUrl = "{{ route('ticket.data') }}";
+        const datatable = $('#ticket').DataTable({
           "processing": true,
           "serverSide": true,
-          "ajax": "{{ route('ticket.data') }}",
+          "ajax": requestUrl,
           "columns":[
             { "data": "id" },
             { "data": "created_at" },
@@ -62,24 +62,27 @@ $breadcrumbs = [
                 return data.name;
               },
             },
-            { "data": "name" },
-            // { "data": "description" },
-            { "data": "check_link_1" },
-            { "data": "check_link_2" },
-            // { 
-            //   "data": "actions",
-            //   "render": function(data, type, row) {
-            //     if (data.length == 0) return '-';
+            {
+              "data": "helpdesk" ,
+              "render": function(data, type, row) {
+                return data.location.name;
+              },
+            },
+            { "data": "description" },
+            { 
+              "data": "actions",
+              "render": function(data, type, row) {
+                if (data.length == 0) return '-';
 
-            //     let html = '<ul style="margin-left: 1rem">';
-            //     data.forEach(function(item) {
-            //       html += '<li>' + item.action.name + '</li>';
-            //     });
-            //     html += '</ul>';
+                let html = '<ul style="margin-left: 1rem">';
+                data.forEach(function(item) {
+                  html += '<li>' + item.action.name + '</li>';
+                });
+                html += '</ul>';
 
-            //     return html;
-            //   }
-            // },
+                return html;
+              }
+            },
             { "data": "status" },
             {
               "data": "technician" ,
@@ -89,6 +92,13 @@ $breadcrumbs = [
               },
             },
           ]
+        });
+
+        $('#filterForm').on('submit', function(event) {
+          event.preventDefault();
+          var selectedStatus = $('#filterSelect').val();
+          // Update the datatable's AJAX URL with the selected status
+          datatable.ajax.url(`${requestUrl}?status=${selectedStatus}`).load();
         });
       });
     </script>

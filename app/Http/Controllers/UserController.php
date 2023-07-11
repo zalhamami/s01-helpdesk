@@ -9,15 +9,21 @@ use App\Models\Location;
 use App\Models\UserSetting;
 use Yajra\DataTables\DataTables;
 use App\Models\Ticket;
+use Illuminate\Database\QueryException;
 
 class UserController extends Controller
 {
     public function index()
     {
         $title = 'User';
-        $location = Location::all();
-        $user_setting = UserSetting::all();
-        return view('user', ['title' => $title], compact('location', 'user_setting'));
+        $locations = Location::all();
+        $user_settings = UserSetting::all();
+        return view('user', ['title' => $title], compact('locations', 'user_settings'));
+    }
+
+    public function get(User $user)
+    {
+        return response()->json($user);
     }
 
     public function profile()
@@ -55,6 +61,7 @@ class UserController extends Controller
     public function update(Request $request)
     {
         $request->validate([
+            'id' => 'required|integer|exists:users,id',
             'name' => 'required|string',
             'username' => 'required|string|alpha_num',
             'email' => 'required|email',
@@ -64,7 +71,7 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8',
         ]);
 
-        $user = User::find(auth()->user()->id);
+        $user = User::find($request->id);
         $user->name = $request->name;
         $user->username = $request->username;
         $user->phone = '0' . $request->phone;
@@ -85,6 +92,17 @@ class UserController extends Controller
         $user->save();
 
         return back()->with('success', 'Data berhasil disimpan');
+    }
+
+    public function delete(User $user)
+    {
+        try {
+            $user->delete();
+        } catch (QueryException $e) {
+            return back()->withErrors(['This data has relation and cannot be deleted.']);
+        }
+
+        return back()->with('success', 'Data berhasil dihapus');
     }
 
     public function getUsers(Request $request)

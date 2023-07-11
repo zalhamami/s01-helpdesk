@@ -23,13 +23,14 @@ $role = $user->user_setting->name;
       
       <form action="{{ route('user.update') }}" method="POST">
         @csrf
+        <input type="hidden" value="{{ $user->id }}" name="id">
         <div class="setting-item">
           <div class="row g-2 align-items-center">
             <div class="col-md-5">
               <h6>Name</h6>
             </div><!-- col -->
             <div class="col-md">
-              <input type="text" class="form-control" value="{{ $user->name }}" id="name" name="name" required disabled>
+              <input type="text" class="form-control" value="{{ $user->name }}" id="name" name="name" required>
             </div><!-- col -->
           </div><!-- row -->
         </div><!-- setting-item -->
@@ -39,7 +40,7 @@ $role = $user->user_setting->name;
               <h6>Username</h6>
             </div><!-- col -->
             <div class="col-md">
-              <input type="text" class="form-control" value="{{ $user->username }}" id="username" name="username" required disabled>
+              <input type="text" class="form-control" value="{{ $user->username }}" id="username" name="username" required>
             </div><!-- col -->
           </div><!-- row -->
         </div><!-- setting-item -->

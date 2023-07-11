@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\TicketController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserSettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,4 +24,16 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'ticket'], function () {
     Route::get('/{ticket}', [TicketController::class, 'get'])->name('ticket.get');
+});
+
+Route::group(['prefix' => 'location'], function () {
+    Route::get('/{location}', [LocationController::class, 'get'])->name('location.get');
+});
+
+Route::group(['prefix' => 'user-setting'], function () {
+    Route::get('/{userSetting}', [UserSettingController::class, 'get'])->name('userSetting.get');
+});
+
+Route::group(['prefix' => 'user'], function () {
+    Route::get('/{user}', [UserController::class, 'get'])->name('userSetting.get');
 });

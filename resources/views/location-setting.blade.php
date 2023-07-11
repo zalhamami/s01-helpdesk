@@ -24,6 +24,7 @@ $breadcrumbs = [
             <tr>
               <th scope="col" width="5%">No</th>
               <th scope="col" width="50%">Location</th>
+              <th scope="col"></th>
             </tr>
           </thead>
         </table>
@@ -43,13 +44,39 @@ $breadcrumbs = [
             @csrf
             <div class="form-group mb-4">
               <label for="" class="mb-3">Location</label>
-              <input type="text" class="form-control form-control-solid" name="location" >
+              <input type="text" class="form-control form-control-solid" name="location" required>
               </select> 
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <input type="submit" class="btn btn-primary" value="Save Change"/>
+            <input type="submit" class="btn btn-primary" value="Save Changes"/>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Location</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="{{ route('location.update') }}" method="POST">
+          <div class="modal-body">
+            @csrf
+            <input type="hidden" id="update_id" name="id" >
+            <div class="form-group mb-4">
+              <label for="" class="mb-3">Location</label>
+              <input type="text" class="form-control form-control-solid" id="update_name" name="location" required>
+              </select> 
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <input type="submit" class="btn btn-primary" value="Save Changes"/>
           </div>
         </form>
       </div>
@@ -66,9 +93,35 @@ $breadcrumbs = [
           "columns":[
             { "data": "id" },
             { "data": "name" },
+            {
+              "data": null,
+              "render": function (data, type, row) {
+                let html = '<div class="btn-group" role="group">';
+                html += '<a href="#editModal" data-bs-toggle="modal"><button class="btn btn-primary btn-sm" onclick="editRow(' + data.id + ')">Edit</button></a>';
+                html += '<button class="btn btn-danger btn-sm" onclick="deleteRow(' + data.id + ')">Delete</button>';
+                html += '</div>';
+                return html;
+              }
+            }
           ]
         });
       });
+
+      async function editRow(id) {
+        const updateId = document.getElementById('update_id');
+        const updateName = document.getElementById('update_name');
+
+        const response = await fetch(`/api/location/${id}`);
+        const result = await response.json();
+
+        updateId.value = result.id;
+        updateName.value = result.name;
+      }
+
+      function deleteRow(id) {
+        if (confirm('Are you sure want to delete this data?') == false) return;
+        window.location.href = `/location-setting/${id}/delete`;
+      }
     </script>
   @endpush
 </x-dashboard-layout>
