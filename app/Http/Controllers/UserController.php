@@ -43,6 +43,7 @@ class UserController extends Controller
             'phone' => 'required|string',
             'location' => 'required|integer|exists:locations,id',
             'user_setting' => 'required|integer|exists:user_settings,id',
+            'password' => 'required|string|min:8',
         ]);
 
         User::create([

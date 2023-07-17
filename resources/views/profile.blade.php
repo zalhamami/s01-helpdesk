@@ -80,7 +80,7 @@ $role = $user->user_setting->name;
               <h6>Location Setting</h6>
             </div><!-- col -->
             <div class="col-md">
-              <select class="form-select" name="location_id" value="{{ $user->location_id }}" disabled>
+              <select class="form-select" name="location_id" id="location_id" disabled>
                 @foreach ($locations as $location)
                 <option value="{{ $location->id }}">
                   {{ $location->name }}
@@ -96,7 +96,7 @@ $role = $user->user_setting->name;
               <h6>User Setting</h6>
             </div><!-- col -->
             <div class="col-md">
-              <select class="form-select" name="user_setting_id" value="{{ $user->user_setting_id }}" disabled>
+              <select class="form-select" name="user_setting_id" id="user_setting_id" disabled>
                 @foreach ($userSettings as $userSetting)
                 <option value="{{ $userSetting->id }}">
                   {{ $userSetting->name }}
@@ -120,4 +120,14 @@ $role = $user->user_setting->name;
       </form>
     </div><!-- card-body -->
   </div><!-- card -->
+
+  @push('scripts')
+  <script type="text/javascript">
+    const locationIdInput = document.getElementById('location_id');
+    const userSettingIdInput = document.getElementById('user_setting_id');
+
+    locationIdInput.value = '{{ $user->location_id }}';
+    userSettingIdInput.value = '{{ $user->user_setting_id }}';
+  </script>
+  @endpush
 </x-dashboard-layout>
