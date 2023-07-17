@@ -21,6 +21,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('secret'),
                 'user_setting_id' => 1,
                 'location_id' => 1,
+                'phone' => '081388130929',
             ],
             [
                 'name' => 'Helpdesk',
@@ -29,6 +30,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('secret'),
                 'user_setting_id' => 2,
                 'location_id' => 1,
+                'phone' => '081388130929',
             ],
             [
                 'name' => 'Teknisi',
@@ -37,6 +39,7 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('secret'),
                 'user_setting_id' => 3,
                 'location_id' => 1,
+                'phone' => '081388130929',
             ],
         ];
 

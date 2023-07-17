@@ -10,8 +10,8 @@ $role = auth()->user()->user_setting->name;
     </a>
   </div>
   <div id="sidebarMenu" class="sidebar-body">
-    <div class="nav-group show">
-      <a href="{{ route('dashboard') }}" class="nav-label">Dashboard</a>
+    <div class="nav-group show">  
+      <a href="#" class="nav-label">Dashboard</a>
       <ul class="nav nav-sidebar">
         <li class="nav-item">
           <a href="{{ route('dashboard') }}" class="nav-link"><i class="ri-home-3-line"></i> <span>Dashboard</span></a>

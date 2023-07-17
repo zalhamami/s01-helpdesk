@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->uuid('code');
             $table->foreignId('technician_id')->nullable()->constrained('users');
             $table->foreignId('helpdesk_id')->nullable()->constrained('users');
+            $table->foreignId('location_id')->nullable()->constrained('locations');
             $table->enum('status', ['open', 'pending', 'solved', 'closed'])->default('open');
             $table->text('description');
             $table->text('solution')->nullable();

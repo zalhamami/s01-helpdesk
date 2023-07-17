@@ -1,5 +1,6 @@
 @php
 $role = auth()->user()->user_setting->name;
+$isTechnician = $role == 'Teknisi';
 
 $breadcrumbs = [
   ['label' => 'Dashboard', 'route' => 'dashboard', 'active' => false],
@@ -23,10 +24,12 @@ $breadcrumbs = [
       <form id="filterForm" action="#" class="mb-3">
         <div class="d-flex">
           <select id="filterSelect" class="form-select w-auto">
+            <option value="">All</option>
             <option value="open">Open</option>
             <option value="solved">Solved</option>
             <option value="closed">Closed</option>
           </select>
+          <input type="text" id="filterDate" class="form-select w-auto ms-2" placeholder="Select Date" readonly>
           <button class="btn btn-primary ms-2">
             Filter
           </button>
@@ -38,12 +41,14 @@ $breadcrumbs = [
             <tr>
               <th scope="col" width="5%">No</th>
               <th scope="col" width="100">Date</th>
+              <th scope="col" width="100">Closed Date</th>
               <th scope="col">Helpdesk</th>
-              <th scope="col">Location</th>
+              <th scope="col">Store Location</th>
               <th scope="col" width="300">Description</th>
               <th scope="col" width="300">Helpdesk Solution</th>
               <th scope="col">Status</th>
               <th scope="col">Technician</th>
+              <th scope="col">Technician Action</th>
               <th scope="col"></th>
             </tr>
           </thead>
@@ -74,8 +79,13 @@ $breadcrumbs = [
               </select>
             </div>
             <div class="form-group mb-4">
-              <label for="text" class="mb-3">Title</label>
-              <input type="text" class="form-control mb-2" id="text" name="name">
+              <label for="text" class="mb-3">Store Location</label>
+              <select class="form-select" name="location">
+                @foreach ($locations as $location)
+                <option value="{{ $location->id }}">
+                  {{ $location->name }}</option>
+                @endforeach
+              </select> 
             </div>
 
             <div class="form-group mb-4">
@@ -113,27 +123,33 @@ $breadcrumbs = [
         </div>
         <form action="{{ route('ticket.update') }}" method="POST">
           <div class="modal-body">
+            <h5 id="ticket_code" class="mb-4"></h5>
             @csrf
             <input type="hidden" id="update_id" name="ticket_id">
             <div class="form-group mb-4">
               <label for="pengecekan_link" class="mb-3">Link Check</label>
-              <select class="form-select mb-2" name="check_link_1" id="update_check_link_1" disabled>
+              <select class="form-select mb-2" name="check_link_1" id="update_check_link_1" {{ $isTechnician ? 'disabled' : '' }}>
                 <option value="GSM DOWN">GSM DOWN</option>
                 <option value="GSM UP">GSM UP</option>
               </select>
-              <select class="form-select" name="check_link_2" id="update_check_link_2" disabled>
+              <select class="form-select" name="check_link_2" id="update_check_link_2" {{ $isTechnician ? 'disabled' : '' }}>
                 <option value="MPLS DOWN">MPLS DOWN</option>
                 <option value="MPLS UP">MPLS UP</option>
               </select>
             </div>
             <div class="form-group mb-4">
-              <label for="text" class="mb-3">Title</label>
-              <input type="text" class="form-control mb-2" id="update_title" name="name" disabled>
+              <label for="text" class="mb-3">Store Location</label>
+              <select class="form-select" name="location" id="update_location" {{ $isTechnician ? 'disabled' : '' }}>
+                @foreach ($locations as $location)
+                <option value="{{ $location->id }}">
+                  {{ $location->name }}</option>
+                @endforeach
+              </select> 
             </div>
 
             <div class="form-group mb-4">
               <label for="text" class="mb-3">Description</label>
-              <textarea input type="text" class="form-control mb-2" id="update_description" name="description" rows="5" disabled></textarea>
+              <textarea input type="text" class="form-control mb-2" id="update_description" name="description" rows="5" {{ $isTechnician ? 'disabled' : '' }}></textarea>
             </div>
 
             <div class="form-group">
@@ -141,14 +157,16 @@ $breadcrumbs = [
               <div id="update_action_list"></div>
             </div>
 
+            @if($isTechnician)
             <div class="form-group mb-4">
               <label for="text" class="mb-3">Technician Action</label>
               <textarea input type="text" class="form-control mb-2" id="update_solution" name="solution" rows="5" required></textarea>
             </div>
+            @endif
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <input type="submit" class="btn btn-primary" value="Solve Ticket"/>
+            <input type="submit" class="btn btn-primary" value="Update"/>
           </div>
         </form>
       </div>
@@ -189,15 +207,24 @@ $breadcrumbs = [
   @push('scripts')
     <script type="text/javascript">
       const role = '{{ $role }}';
+      const isTechnician = role == 'Teknisi';
+      const isHelpdesk = role == 'Helpdesk';
+      
       $(document).ready(function() {
         const requestUrl = "{{ $role == 'Helpdesk' ? route('ticket.data-helpdesk') : route('ticket.data-technician') }}";
         const datatable = $('#ticket').DataTable({
           "processing": true,
           "serverSide": true,
           "ajax": requestUrl,
-          "columns":[
-            { "data": "id" },
+          "columns": [
+            { 
+              "data": null,
+              "render": function (data, type, row, meta) {
+                return meta.row + 1;
+              }
+            },
             { "data": "created_at" },
+            { "data": "closed_at" },
             {
               "data": "helpdesk" ,
               "render": function(data, type, row) {
@@ -205,9 +232,9 @@ $breadcrumbs = [
               },
             },
             {
-              "data": "helpdesk" ,
+              "data": "location" ,
               "render": function(data, type, row) {
-                return data.location.name;
+                return data.name;
               },
             },
             { "data": "description" },
@@ -233,20 +260,32 @@ $breadcrumbs = [
                 return data.name;
               },
             },
+            {
+              "data": "solution" ,
+              "render": function(data, type, row) {
+                if (data == null) return '-';
+                return data;
+              },
+            },
             { 
               "data": null,
               "render": function(data, type, row) {
                 let html = '<div class="btn-group" role="group">';
+
                 if (!data.technician) {
-                  html += '<a href="#assignTechnicianModal" data-bs-toggle="modal"><button class="btn btn-secondary btn-sm" onclick="assignTechnician(' + data.id + ')">Assign Technician</button></a>';
+                  html += '<a href="#assignTechnicianModal" data-bs-toggle="modal"><button class="btn btn-secondary btn-sm" onclick="assignTechnician(' + data.id + ')">Assign</button></a>';
                 }
 
-                if (role == 'Teknisi' && data.status != 'closed') {
-                  html += '<a href="#editModal" data-bs-toggle="modal"><button class="btn btn-primary btn-sm" onclick="editRow(' + data.id + ')">Edit</button></a>';
+                if (data.status != 'closed') {
+                  html += '<a href="#editModal" data-bs-toggle="modal"><button class="btn btn-warning btn-sm" onclick="editRow(' + data.id + ')">Edit</button></a>';
                 }
 
-                if (role == 'Helpdesk' && data.status == 'solved') {
-                  html += '<button class="btn btn-primary btn-sm" onclick="closeTicket(' + data.id + ')">Close</button>';
+                if (isTechnician && data.status == 'open') {
+                  html += '<button class="btn btn-primary btn-sm" onclick="solveTicket(' + data.id + ')">Solve</button>';
+                }
+
+                if (isHelpdesk && data.status == 'solved') {
+                  html += '<button class="btn btn-danger btn-sm" onclick="closeTicket(' + data.id + ')">Close</button>';
                 }
 
                 // html += '<button class="btn btn-danger btn-sm" onclick="deleteRow(' + data.id + ')">Delete</button>';
@@ -257,11 +296,28 @@ $breadcrumbs = [
           ]
         });
 
+        $('#filterDate').datepicker({
+          format: 'yyyy-mm-dd',
+          autoclose: true,
+          todayHighlight: true
+        });
+
         $('#filterForm').on('submit', function(event) {
           event.preventDefault();
           var selectedStatus = $('#filterSelect').val();
-          // Update the datatable's AJAX URL with the selected status
-          datatable.ajax.url(`${requestUrl}?status=${selectedStatus}`).load();
+          var date = $('#filterDate').val();
+
+          let requestFilterUrl = `${requestUrl}?`;
+          
+          if (selectedStatus) {
+            requestFilterUrl += `status=${selectedStatus}`;
+          }
+          
+          if (date) {
+            requestFilterUrl += `&date=${date}`;
+          }
+
+          datatable.ajax.url(requestFilterUrl).load();
         });
       });
 
@@ -276,26 +332,43 @@ $breadcrumbs = [
         }
       }
 
+      function solveTicket(id) {
+        if (confirm('Are you sure you want to solve this ticket?')) {
+          window.location.href = '/ticket/' + id + '/solve';
+        }
+      }
+
       async function editRow(id) {
+        const ticketCode = document.getElementById('ticket_code');
         const ticketId = document.getElementById('update_id');
-        const ticketTitle = document.getElementById('update_title');
+        const ticketLocation = document.getElementById('update_location');
         const ticketDescription = document.getElementById('update_description');
         const ticketSolution = document.getElementById('update_solution');
         const ticketActionList = document.getElementById('update_action_list');
+        const ticketCheckLink = document.getElementById('update_check_link_1');
+        const ticketCheckLink2 = document.getElementById('update_check_link_2');
 
         const response = await fetch(`/api/ticket/${id}`);
         const currentTicket = await response.json();
 
+        console.info(currentTicket);
+        ticketCode.innerHTML = 'Code: ' + currentTicket.code;
         ticketId.value = currentTicket.id;
-        ticketTitle.value = currentTicket.name;
+        ticketLocation.value = currentTicket.location_id;
         ticketDescription.value = currentTicket.description;
-        ticketSolution.value = currentTicket.solution;
+        ticketCheckLink.value = currentTicket.check_link_1;
+        ticketCheckLink2.value = currentTicket.check_link_2;
+
+        if (ticketSolution) {
+          ticketSolution.value = currentTicket.solution;
+        }
 
         let helpdeskSolution = '<ul>';
         currentTicket.actions.forEach((item) => {
           helpdeskSolution += `<li>${item.action.name}</li>`;
         });
         helpdeskSolution += '</ul>';
+        console.info(helpdeskSolution);
         ticketActionList.innerHTML = helpdeskSolution;
       }
 

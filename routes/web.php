@@ -47,6 +47,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [TicketController::class, 'index'])->name('ticket.index');
         Route::post('/update', [TicketController::class, 'update'])->name('ticket.update');
         Route::get('/{ticket}/close', [TicketController::class, 'close'])->name('ticket.close');
+        Route::get('/{ticket}/solve', [TicketController::class, 'solve'])->name('ticket.solve');
         Route::get('/{ticket}/detail', [TicketController::class, 'show'])->name('ticket.show');
         Route::post('/technician', [TicketController::class, 'assignTechnician'])->name('ticket.assignTechnician');
         Route::post('/', [TicketController::class, 'store'])->name('ticket.store');

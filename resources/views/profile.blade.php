@@ -30,7 +30,7 @@ $role = $user->user_setting->name;
               <h6>Name</h6>
             </div><!-- col -->
             <div class="col-md">
-              <input type="text" class="form-control" value="{{ $user->name }}" id="name" name="name" required>
+              <input type="text" class="form-control" value="{{ $user->name }}" id="name" name="name" required disabled>
             </div><!-- col -->
           </div><!-- row -->
         </div><!-- setting-item -->
@@ -40,7 +40,7 @@ $role = $user->user_setting->name;
               <h6>Username</h6>
             </div><!-- col -->
             <div class="col-md">
-              <input type="text" class="form-control" value="{{ $user->username }}" id="username" name="username" required>
+              <input type="text" class="form-control" value="{{ $user->username }}" id="username" name="username" required disabled>
             </div><!-- col -->
           </div><!-- row -->
         </div><!-- setting-item -->

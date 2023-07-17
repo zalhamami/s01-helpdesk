@@ -91,7 +91,12 @@ $breadcrumbs = [
           "serverSide": true,
           "ajax": "{{ route('user-setting.data') }}",
           "columns":[
-            { "data": "id" },
+            { 
+              "data": null,
+              "render": function (data, type, row, meta) {
+                return meta.row + 1;
+              }
+            },
             { "data": "name" },
             {
               "data": null,

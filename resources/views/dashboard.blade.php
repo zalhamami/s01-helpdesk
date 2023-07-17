@@ -16,10 +16,12 @@ $breadcrumbs = [
       <form id="filterForm" action="#" class="mb-3">
         <div class="d-flex">
           <select id="filterSelect" class="form-select w-auto">
+            <option value="">All</option>
             <option value="open">Open</option>
             <option value="solved">Solved</option>
             <option value="closed">Closed</option>
           </select>
+          <input type="text" id="filterDate" class="form-select w-auto ms-2" placeholder="Select Date" readonly>
           <button class="btn btn-primary ms-2">
             Filter
           </button>
@@ -31,13 +33,13 @@ $breadcrumbs = [
             <tr>
               <th scope="col" width="5%">No</th>
               <th scope="col" width="100">Date</th>
+              <th scope="col" width="100">Closed Date</th>
               <th scope="col">Helpdesk</th>
               <th scope="col">Location</th>
               <th scope="col" width="300">Description</th>
               <th scope="col" width="300">Helpdesk Solution</th>
               <th scope="col">Status</th>
               <th scope="col">Technician</th>
-              <th scope="col"></th>
             </tr>
           </thead>
         </table>
@@ -53,9 +55,15 @@ $breadcrumbs = [
           "processing": true,
           "serverSide": true,
           "ajax": requestUrl,
-          "columns":[
-            { "data": "id" },
+          "columns": [
+            { 
+              "data": null,
+              "render": function (data, type, row, meta) {
+                return meta.row + 1;
+              }
+            },
             { "data": "created_at" },
+            { "data": "closed_at" },
             {
               "data": "helpdesk" ,
               "render": function(data, type, row) {
@@ -94,11 +102,28 @@ $breadcrumbs = [
           ]
         });
 
+        $('#filterDate').datepicker({
+          format: 'yyyy-mm-dd',
+          autoclose: true,
+          todayHighlight: true
+        });
+
         $('#filterForm').on('submit', function(event) {
           event.preventDefault();
           var selectedStatus = $('#filterSelect').val();
-          // Update the datatable's AJAX URL with the selected status
-          datatable.ajax.url(`${requestUrl}?status=${selectedStatus}`).load();
+          var date = $('#filterDate').val();
+
+          let requestFilterUrl = `${requestUrl}?`;
+          
+          if (selectedStatus) {
+            requestFilterUrl += `status=${selectedStatus}`;
+          }
+          
+          if (date) {
+            requestFilterUrl += `&date=${date}`;
+          }
+
+          datatable.ajax.url(requestFilterUrl).load();
         });
       });
     </script>

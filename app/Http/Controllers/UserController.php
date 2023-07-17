@@ -38,7 +38,7 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'username' => 'required|string|alpha_num',
+            'username' => 'required|string|alpha_num|unique:users',
             'email' => 'required|email',
             'phone' => 'required|string',
             'location' => 'required|integer|exists:locations,id',
@@ -50,7 +50,7 @@ class UserController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'phone' => '0' . $request->no_telp,
+            'phone' => $request->phone,
             'location_id' => $request->location,
             'user_setting_id' => $request->user_setting,
         ]);
@@ -62,8 +62,8 @@ class UserController extends Controller
     {
         $request->validate([
             'id' => 'required|integer|exists:users,id',
-            'name' => 'required|string',
-            'username' => 'required|string|alpha_num',
+            'name' => 'nullable|string',
+            'username' => 'nullable|string|alpha_num',
             'email' => 'required|email',
             'phone' => 'required|string',
             'location_id' => 'nullable|integer|exists:locations,id',
@@ -72,10 +72,16 @@ class UserController extends Controller
         ]);
 
         $user = User::find($request->id);
-        $user->name = $request->name;
-        $user->username = $request->username;
-        $user->phone = '0' . $request->phone;
+        $user->phone = $request->phone;
         $user->email = $request->email;
+
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+
+        if ($request->has('username')) {
+            $user->username = $request->username;
+        }
 
         if ($request->has('password')) {
             $user->password = bcrypt($request->password);
